@@ -26,7 +26,7 @@ const features = [
   {
     icon: Gift,
     title: "Free Forever",
-    description: "3GB monthly data absolutely free. No hidden costs, no premium upsells.",
+    description: "10GB monthly data. Daily check-in bonuses. No credit card needed.",
   },
   {
     icon: Power,

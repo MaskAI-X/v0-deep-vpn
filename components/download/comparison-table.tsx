@@ -5,10 +5,17 @@ import { Check, X, Minus } from "lucide-react"
 const vpnComparison = [
   {
     feature: "Price",
-    deepvpn: "Free",
+    deepvpn: "Free (10GB/mo + bonuses)",
     nordvpn: "$12.99/mo",
     expressvpn: "$12.95/mo",
     surfshark: "$12.95/mo",
+  },
+  {
+    feature: "Free Tier Data",
+    deepvpn: "10GB + daily bonuses",
+    nordvpn: "None",
+    expressvpn: "None",
+    surfshark: "None",
   },
   {
     feature: "No Logs Policy",

@@ -36,8 +36,8 @@ export function DashboardContent() {
   const [autoConnect, setAutoConnect] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  const usedData = 1.2 // GB
-  const totalData = 3 // GB
+  const usedData = 4.2 // GB
+  const totalData = 10 // GB
   const dataPercentage = (usedData / totalData) * 100
 
   const handleCopyKey = () => {

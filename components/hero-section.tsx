@@ -61,7 +61,7 @@ export function HeroSection() {
         {/* Trust Badge */}
         <div className="mt-12 flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-          <span>3GB free monthly • No credit card required</span>
+          <span>10GB free monthly + daily bonuses • No credit card required</span>
         </div>
       </div>
       

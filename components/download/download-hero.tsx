@@ -17,7 +17,7 @@ export function DownloadHero() {
         </h1>
         
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
-          Get started in seconds. No registration. No credit card. Just download, connect, and browse securely.
+          10GB free monthly data + daily bonuses. Enough for everyday use. No registration. No credit card. Just download, connect, and browse securely.
         </p>
 
         {/* QR Code Section */}
