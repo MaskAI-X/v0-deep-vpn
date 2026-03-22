@@ -178,45 +178,7 @@ export function ServerMapSection() {
             </div>
           </div>
 
-          <div className="mt-8">
-            <h3 className="text-sm font-medium text-muted-foreground mb-4 text-center">Server Locations</h3>
-            <div className="flex flex-wrap justify-center gap-2 md:gap-3">
-              {visibleServers.map((server) => (
-                <div
-                  key={server.name}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-default ${
-                    hoveredServer === server.name
-                      ? "bg-cyan-500/20 border-cyan-500/50"
-                      : "bg-secondary/50 border-border hover:border-cyan-500/30"
-                  }`}
-                  onMouseEnter={() => setHoveredServer(server.name)}
-                  onMouseLeave={() => setHoveredServer(null)}
-                >
-                  <span className="text-base">{server.flag}</span>
-                  <span className="text-xs md:text-sm text-foreground">{server.name}</span>
-                  {server.servers > 1 && (
-                    <span className="text-xs text-cyan-400">x{server.servers}</span>
-                  )}
-                </div>
-              ))}
-            </div>
           </div>
-        </div>
-
-        <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto text-center">
-          <div>
-            <div className="text-3xl md:text-4xl font-bold gradient-text">17</div>
-            <div className="text-sm text-muted-foreground mt-1">Servers</div>
-          </div>
-          <div>
-            <div className="text-3xl md:text-4xl font-bold gradient-text">15</div>
-            <div className="text-sm text-muted-foreground mt-1">Countries</div>
-          </div>
-          <div>
-            <div className="text-3xl md:text-4xl font-bold gradient-text">99.9%</div>
-            <div className="text-sm text-muted-foreground mt-1">Uptime</div>
-          </div>
-        </div>
       </div>
     </section>
   )
