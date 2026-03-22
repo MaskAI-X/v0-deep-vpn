@@ -75,7 +75,7 @@ export function ServerMapSection() {
         </div>
 
         <div className="relative">
-          <div className="glass-card rounded-3xl p-4 md:p-8 overflow-hidden">
+          <div className="rounded-3xl overflow-hidden">
             <div className="relative aspect-[2/1] md:aspect-[2.2/1]">
               <ComposableMap
                 projection="geoNaturalEarth1"
@@ -116,8 +116,7 @@ export function ServerMapSection() {
                   </linearGradient>
                 </defs>
 
-                {/* Ocean background */}
-                <rect x="-50" y="-50" width="1000" height="1000" fill="#050d1a" />
+                {/* Transparent background - blends with page */}
 
                 {/* Countries/Land */}
                 <Geographies geography={geoUrl}>
@@ -126,12 +125,12 @@ export function ServerMapSection() {
                       <Geography
                         key={geo.rsmKey}
                         geography={geo}
-                        fill="#0a1628"
-                        stroke="#0e2240"
+                        fill="rgba(15, 35, 60, 0.6)"
+                        stroke="rgba(0, 180, 180, 0.15)"
                         strokeWidth={0.5}
                         style={{
                           default: { outline: "none" },
-                          hover: { outline: "none", fill: "#0d1d35" },
+                          hover: { outline: "none", fill: "rgba(20, 45, 75, 0.7)" },
                           pressed: { outline: "none" },
                         }}
                       />
