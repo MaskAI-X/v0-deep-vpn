@@ -1,153 +1,215 @@
 "use client"
 
+import { useState } from "react"
+import {
+  ComposableMap,
+  Geographies,
+  Geography,
+  Marker,
+  Line,
+} from "react-simple-maps"
+
+const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"
+
 const serverLocations = [
-  { name: "United States", x: 22, y: 40, servers: 3 },
-  { name: "Canada", x: 20, y: 28, servers: 1 },
-  { name: "United Kingdom", x: 47, y: 32, servers: 2 },
-  { name: "Germany", x: 51, y: 33, servers: 2 },
-  { name: "Netherlands", x: 50, y: 31, servers: 1 },
-  { name: "France", x: 48, y: 36, servers: 1 },
-  { name: "Singapore", x: 76, y: 55, servers: 2 },
-  { name: "Japan", x: 85, y: 38, servers: 2 },
-  { name: "Australia", x: 85, y: 72, servers: 1 },
-  { name: "South Korea", x: 82, y: 38, servers: 1 },
-  { name: "Hong Kong", x: 79, y: 45, servers: 1 },
-  { name: "Brazil", x: 32, y: 65, servers: 1 },
-  { name: "India", x: 70, y: 48, servers: 1 },
+  { name: "Singapore", country: "SG", flag: "🇸🇬", coordinates: [103.8198, 1.3521], servers: 2 },
+  { name: "Singapore 2", country: "SG", flag: "🇸🇬", coordinates: [103.85, 1.32], servers: 0, hidden: true },
+  { name: "Tokyo", country: "JP", flag: "🇯🇵", coordinates: [139.6917, 35.6895], servers: 1 },
+  { name: "Seoul", country: "KR", flag: "🇰🇷", coordinates: [126.978, 37.5665], servers: 1 },
+  { name: "Sydney", country: "AU", flag: "🇦🇺", coordinates: [151.2093, -33.8688], servers: 1 },
+  { name: "Mumbai", country: "IN", flag: "🇮🇳", coordinates: [72.8777, 19.076], servers: 1 },
+  { name: "São Paulo", country: "BR", flag: "🇧🇷", coordinates: [-46.6333, -23.5505], servers: 1 },
+  { name: "Johannesburg", country: "ZA", flag: "🇿🇦", coordinates: [28.0473, -26.2041], servers: 1 },
+  { name: "Hong Kong", country: "HK", flag: "🇭🇰", coordinates: [114.1694, 22.3193], servers: 1 },
+  { name: "Dubai", country: "AE", flag: "🇦🇪", coordinates: [55.2708, 25.2048], servers: 1 },
+  { name: "Taipei", country: "TW", flag: "🇹🇼", coordinates: [121.5654, 25.033], servers: 1 },
+  { name: "Ho Chi Minh", country: "VN", flag: "🇻🇳", coordinates: [106.6297, 10.8231], servers: 1 },
+  { name: "Kuala Lumpur", country: "MY", flag: "🇲🇾", coordinates: [101.6869, 3.139], servers: 1 },
+  { name: "Ashburn", country: "US", flag: "🇺🇸", coordinates: [-77.4875, 39.0438], servers: 1 },
+  { name: "Hillsboro", country: "US", flag: "🇺🇸", coordinates: [-122.9365, 45.5229], servers: 1 },
+  { name: "Nuremberg", country: "DE", flag: "🇩🇪", coordinates: [11.0767, 49.4521], servers: 1 },
+  { name: "Helsinki", country: "FI", flag: "🇫🇮", coordinates: [24.9384, 60.1699], servers: 1 },
+]
+
+const visibleServers = serverLocations.filter(s => !s.hidden)
+
+const connectionLines = [
+  { from: "Singapore", to: "Hong Kong" },
+  { from: "Hong Kong", to: "Tokyo" },
+  { from: "Tokyo", to: "Seoul" },
+  { from: "Singapore", to: "Kuala Lumpur" },
+  { from: "Kuala Lumpur", to: "Ho Chi Minh" },
+  { from: "Singapore", to: "Sydney" },
+  { from: "Dubai", to: "Mumbai" },
+  { from: "Nuremberg", to: "Helsinki" },
+  { from: "Ashburn", to: "Hillsboro" },
+  { from: "São Paulo", to: "Ashburn" },
 ]
 
 export function ServerMapSection() {
+  const [hoveredServer, setHoveredServer] = useState<string | null>(null)
+
+  const getCoordinates = (name: string) => {
+    const server = serverLocations.find(s => s.name === name)
+    return server?.coordinates || [0, 0]
+  }
+
   return (
     <section className="relative py-24 px-4 overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-950/10 to-transparent" />
-      
-      <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Section Header */}
+
+      <div className="relative z-10 max-w-7xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             <span className="gradient-text">Global Server Network</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            17 servers across 13 countries. Connect to the fastest server near you.
+            17 servers across 15 countries. Connect to the fastest server near you.
           </p>
         </div>
-        
-        {/* Map Container */}
-        <div className="relative aspect-[2/1] max-w-4xl mx-auto">
-          {/* World Map SVG */}
-          <svg
-            viewBox="0 0 100 50"
-            className="w-full h-full"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            {/* Simplified world map outline */}
-            <defs>
-              <filter id="mapGlow">
-                <feGaussianBlur stdDeviation="0.3" result="coloredBlur" />
-                <feMerge>
-                  <feMergeNode in="coloredBlur" />
-                  <feMergeNode in="SourceGraphic" />
-                </feMerge>
-              </filter>
-            </defs>
-            
-            {/* Continents as simplified paths */}
-            <g fill="none" stroke="rgba(0,210,210,0.2)" strokeWidth="0.15" filter="url(#mapGlow)">
-              {/* North America */}
-              <path d="M5 20 Q15 15 25 18 Q30 20 32 25 Q28 30 25 35 Q20 38 15 35 Q8 32 5 28 Q3 24 5 20" />
-              {/* South America */}
-              <path d="M25 45 Q30 42 32 48 Q35 55 32 62 Q28 68 25 65 Q22 58 23 52 Q24 48 25 45" />
-              {/* Europe */}
-              <path d="M42 22 Q48 20 55 22 Q58 25 56 30 Q52 35 48 33 Q44 30 42 26 Q41 24 42 22" />
-              {/* Africa */}
-              <path d="M45 35 Q52 33 55 40 Q58 48 55 55 Q50 60 45 55 Q42 48 43 42 Q44 38 45 35" />
-              {/* Asia */}
-              <path d="M55 18 Q70 15 85 20 Q92 25 90 35 Q85 42 75 45 Q65 48 58 42 Q52 35 55 25 Q55 20 55 18" />
-              {/* Australia */}
-              <path d="M78 58 Q85 55 92 58 Q95 62 93 68 Q88 72 82 70 Q78 66 78 62 Q78 60 78 58" />
-            </g>
-            
-            {/* Connection lines between servers */}
-            <g stroke="rgba(0,210,210,0.1)" strokeWidth="0.08">
-              {serverLocations.map((loc, i) => (
-                serverLocations.slice(i + 1, i + 3).map((target, j) => (
-                  <line
-                    key={`line-${i}-${j}`}
-                    x1={loc.x}
-                    y1={loc.y}
-                    x2={target.x}
-                    y2={target.y}
-                    className="animate-pulse"
-                    style={{ animationDelay: `${i * 200}ms` }}
-                  />
-                ))
-              ))}
-            </g>
-            
-            {/* Server location dots */}
-            {serverLocations.map((location, index) => (
-              <g key={location.name}>
-                {/* Outer glow ring */}
-                <circle
-                  cx={location.x}
-                  cy={location.y}
-                  r="1.5"
-                  fill="none"
-                  stroke="rgba(0,210,210,0.3)"
-                  strokeWidth="0.1"
-                  className="animate-ping"
-                  style={{ 
-                    animationDuration: '2s',
-                    animationDelay: `${index * 150}ms`,
-                    transformOrigin: `${location.x}px ${location.y}px`
-                  }}
-                />
-                {/* Main dot */}
-                <circle
-                  cx={location.x}
-                  cy={location.y}
-                  r="0.8"
-                  fill="rgba(0,210,210,0.8)"
-                  className="animate-pulse"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                />
-                {/* Inner bright core */}
-                <circle
-                  cx={location.x}
-                  cy={location.y}
-                  r="0.3"
-                  fill="white"
-                  fillOpacity="0.9"
-                />
-              </g>
-            ))}
-          </svg>
-          
-          {/* Floating location labels - shown on hover in real app */}
-          <div className="absolute bottom-0 left-0 right-0 flex flex-wrap justify-center gap-2 mt-8">
-            {serverLocations.slice(0, 6).map((location) => (
-              <span
-                key={location.name}
-                className="text-xs text-muted-foreground px-2 py-1 rounded-full bg-secondary/50 border border-border"
+
+        <div className="relative">
+          <div className="glass-card rounded-3xl p-4 md:p-8 overflow-hidden">
+            <div className="relative aspect-[2/1] md:aspect-[2.5/1]">
+              <ComposableMap
+                projection="geoMercator"
+                projectionConfig={{
+                  scale: 120,
+                  center: [60, 20],
+                }}
+                style={{ width: "100%", height: "100%" }}
               >
-                {location.name}
-              </span>
-            ))}
-            <span className="text-xs text-cyan-400 px-2 py-1">
-              +7 more
-            </span>
+                <Geographies geography={geoUrl}>
+                  {({ geographies }) =>
+                    geographies.map((geo) => (
+                      <Geography
+                        key={geo.rsmKey}
+                        geography={geo}
+                        fill="rgba(0, 180, 200, 0.08)"
+                        stroke="rgba(0, 210, 255, 0.15)"
+                        strokeWidth={0.5}
+                        style={{
+                          default: { outline: "none" },
+                          hover: { outline: "none", fill: "rgba(0, 180, 200, 0.12)" },
+                          pressed: { outline: "none" },
+                        }}
+                      />
+                    ))
+                  }
+                </Geographies>
+
+                {connectionLines.map((line, idx) => (
+                  <Line
+                    key={idx}
+                    from={getCoordinates(line.from)}
+                    to={getCoordinates(line.to)}
+                    stroke="rgba(0, 210, 255, 0.2)"
+                    strokeWidth={1}
+                    strokeLinecap="round"
+                    className="animate-pulse"
+                    style={{ animationDelay: `${idx * 200}ms` }}
+                  />
+                ))}
+
+                {visibleServers.map((server, idx) => (
+                  <Marker
+                    key={server.name}
+                    coordinates={server.coordinates as [number, number]}
+                    onMouseEnter={() => setHoveredServer(server.name)}
+                    onMouseLeave={() => setHoveredServer(null)}
+                  >
+                    <g className="cursor-pointer">
+                      <circle
+                        r={12}
+                        fill="rgba(0, 210, 255, 0.15)"
+                        className="animate-ping"
+                        style={{
+                          animationDuration: "2s",
+                          animationDelay: `${idx * 150}ms`,
+                        }}
+                      />
+                      <circle
+                        r={6}
+                        fill="rgba(0, 210, 255, 0.8)"
+                        stroke="rgba(255, 255, 255, 0.5)"
+                        strokeWidth={1}
+                        className="transition-all duration-200"
+                        style={{
+                          filter: hoveredServer === server.name ? "drop-shadow(0 0 8px rgba(0, 210, 255, 0.8))" : "drop-shadow(0 0 4px rgba(0, 210, 255, 0.5))",
+                          transform: hoveredServer === server.name ? "scale(1.3)" : "scale(1)",
+                        }}
+                      />
+                      <circle
+                        r={2}
+                        fill="white"
+                        fillOpacity={0.9}
+                      />
+                    </g>
+
+                    {hoveredServer === server.name && (
+                      <g>
+                        <rect
+                          x={-45}
+                          y={-45}
+                          width={90}
+                          height={30}
+                          rx={6}
+                          fill="rgba(10, 15, 30, 0.95)"
+                          stroke="rgba(0, 210, 255, 0.3)"
+                          strokeWidth={1}
+                        />
+                        <text
+                          textAnchor="middle"
+                          y={-25}
+                          style={{
+                            fontFamily: "system-ui",
+                            fontSize: "11px",
+                            fill: "white",
+                            fontWeight: 500,
+                          }}
+                        >
+                          {server.flag} {server.name}
+                        </text>
+                      </g>
+                    )}
+                  </Marker>
+                ))}
+              </ComposableMap>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <h3 className="text-sm font-medium text-muted-foreground mb-4 text-center">Server Locations</h3>
+            <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+              {visibleServers.map((server) => (
+                <div
+                  key={server.name}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all cursor-default ${
+                    hoveredServer === server.name
+                      ? "bg-cyan-500/20 border-cyan-500/50"
+                      : "bg-secondary/50 border-border hover:border-cyan-500/30"
+                  }`}
+                  onMouseEnter={() => setHoveredServer(server.name)}
+                  onMouseLeave={() => setHoveredServer(null)}
+                >
+                  <span className="text-base">{server.flag}</span>
+                  <span className="text-xs md:text-sm text-foreground">{server.name}</span>
+                  {server.servers > 1 && (
+                    <span className="text-xs text-cyan-400">x{server.servers}</span>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        
-        {/* Stats */}
-        <div className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto text-center">
+
+        <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto text-center">
           <div>
             <div className="text-3xl md:text-4xl font-bold gradient-text">17</div>
             <div className="text-sm text-muted-foreground mt-1">Servers</div>
           </div>
           <div>
-            <div className="text-3xl md:text-4xl font-bold gradient-text">13</div>
+            <div className="text-3xl md:text-4xl font-bold gradient-text">15</div>
             <div className="text-sm text-muted-foreground mt-1">Countries</div>
           </div>
           <div>
